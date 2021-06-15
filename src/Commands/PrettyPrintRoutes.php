@@ -46,7 +46,7 @@ class PrettyPrintRoutes extends Command
             $action = $this->getAction($route->getActionName());
 
             if (\count($methods) == 1) {
-                $definition = PHP_EOL.$this->getMovableRoute($route, $methods, $action, $middlewares);
+                $definition = PHP_EOL . $this->getMovableRoute($route, $methods, $action, $middlewares);
 
                 file_put_contents($filename, $definition, FILE_APPEND);
             }
@@ -84,37 +84,37 @@ class PrettyPrintRoutes extends Command
     {
         if ($action == '\Illuminate\Routing\ViewController::class') {
             $method = 'view';
-            $uriAction = "('/".$route->uri()."', '".$route->defaults['view']."')";
+            $uriAction = "('/" . $route->uri() . "', '" . $route->defaults['view'] . "')";
             $defaults = '';
         } else {
             $method = strtolower($methods[0]);
-            $uriAction = "('/".$route->uri()."', ".$action.')';
+            $uriAction = "('/" . $route->uri() . "', " . $action . ')';
             $defaults = $this->getDefaults($route->defaults);
         }
 
-        $nameSection = ($route->getName() ? ("->name('".$route->getName()."')") : '');
+        $nameSection = ($route->getName() ? ("->name('" . $route->getName() . "')") : '');
 
-        return 'Route::'.$method.$uriAction.PHP_EOL.$middlewareSection.$nameSection.$defaults.';';
+        return 'Route::' . $method . $uriAction . PHP_EOL . $middlewareSection . $nameSection . $defaults . ';';
     }
 
     private function getAction($action)
     {
         $action = Str::start($action, '\\');
-        if (! Str::contains($action, ['@'])) {
-            return $action.'::class';
+        if (!Str::contains($action, ['@'])) {
+            return $action . '::class';
         }
 
         $action = \explode('@', $action);
 
-        return '['.$action[0].'::class'.", '".$action[1]."']";
+        return '[' . $action[0] . '::class' . ", '" . $action[1] . "']";
     }
 
     private function getMiddlewares($route)
     {
         $middlewares = $route->gatherMiddleware();
-        $middlewares && $middlewares = "'".\implode("', '", $route->gatherMiddleware())."'";
+        $middlewares && $middlewares = "'" . \implode("', '", $route->gatherMiddleware()) . "'";
 
-        return $middlewares ? '->middleware(['.$middlewares.'])' : '';
+        return $middlewares ? '->middleware([' . $middlewares . '])' : '';
     }
 
     private function handleRouteProblem($e)
@@ -127,17 +127,18 @@ class PrettyPrintRoutes extends Command
     private function prettyPrintInConsole($route, $middlewares)
     {
         $this->getOutput()->writeln('---------------------------------------------------');
-        $this->info(' name:             '.($route->getName() ? ($route->getName()) : ''));
-        $this->info(' uri:              '.\implode(', ', $route->methods())."   '/".$route->uri()."'  ");
-        $this->info(' middlewares:      '.$middlewares);
-        $this->info(' action:           '.$route->getActionName());
+        $this->info(' name:             ' . ($route->getName() ? ($route->getName()) : ''));
+        $this->info(' uri:              ' . \implode(', ', $route->methods()) . "   '/" . $route->uri() . "'  ");
+        $this->info(' middlewares:      ' . $middlewares);
+        $this->info(' action:           ' . $route->getActionName());
     }
 
     private function getDefaults($values)
     {
         $defaults = '';
+        
         foreach ($values as $key => $val) {
-            $defaults .= "\n".'->defaults('.var_export($key, true).', '.var_export($val, true).')';
+            $defaults .= "\n" . '->defaults(' . var_export($key, true) . ', ' . var_export($val, true) . ')';
         }
 
         return $defaults;
